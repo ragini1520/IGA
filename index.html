@@ -1,27 +1,50 @@
 import React, { useState } from 'react';
-import { Upload, TrendingUp, Hash, Clock, BarChart3, Zap, Video, Image } from 'lucide-react';
+import { Upload, TrendingUp, Hash, Clock, BarChart3, Zap, Video, Image, X, CheckCircle } from 'lucide-react';
 
 const InstaGrowthAssistant = () => {
   const [activeTab, setActiveTab] = useState('caption');
   const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState(null);
   const [caption, setCaption] = useState('');
   const [hashtags, setHashtags] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // Handle video upload with preview
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setVideoFile(file);
+      setUploadSuccess(true);
+      
+      // Create video preview URL
+      const url = URL.createObjectURL(file);
+      setVideoPreview(url);
+      
+      // Reset after showing success
+      setTimeout(() => setUploadSuccess(false), 2000);
+    }
+  };
+
+  // Remove uploaded video
+  const removeVideo = () => {
+    setVideoFile(null);
+    if (videoPreview) {
+      URL.revokeObjectURL(videoPreview);
+      setVideoPreview(null);
+    }
+  };
 
   // Simulated AI Caption Generation
   const generateCaption = () => {
+    if (!videoFile) {
+      alert('Please upload a video first!');
+      return;
+    }
+    
     setLoading(true);
     setTimeout(() => {
-      setCaption(`✨ Transform your space with stunning interiors! 
-
-Apne sapno ka ghar ab aur bhi kareeb hai. Premium sunmica aur modular designs jo aapke budget mein fit ho jaye! 
-
-Swipe to see the magic ➡️
-
-📞 Call now for FREE consultation!
-
-#InteriorDesign #HomeDecor #ModularKitchen #SunmicaDesigns #IndianHomes #InteriorIndia #HomeRenovation #LuxuryInteriors #AffordableInteriors #DreamHome #InteriorInspo #ReelItFeelIt`);
-      
+      setCaption(`✨ Transform your space with stunning interiors!\n\nApne sapno ka ghar ab aur bhi kareeb hai. Premium sunmica aur modular designs jo aapke budget mein fit ho jaye!\n\nSwipe to see the magic ➡️\n\n📞 Call now for FREE consultation!\n\n#InteriorDesign #HomeDecor #ModularKitchen #SunmicaDesigns #IndianHomes #InteriorIndia #HomeRenovation #LuxuryInteriors #AffordableInteriors #DreamHome #InteriorInspo #ReelItFeelIt`);
       setHashtags([
         { tag: '#InteriorDesign', trend: 'High', engagement: '8.2%' },
         { tag: '#HomeDecor', trend: 'High', engagement: '7.8%' },
@@ -42,13 +65,13 @@ Swipe to see the magic ➡️
           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
       }`}
     >
-      <Icon size={18} />
+      <Icon className="w-4 h-4" />
       {label}
     </button>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -59,71 +82,177 @@ Swipe to see the magic ➡️
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-3 mb-6 justify-center">
-          <TabButton name="caption" icon={Video} label="Caption Generator" />
-          <TabButton name="hashtags" icon={Hash} label="Hashtag Research" />
+        <div className="flex gap-2 mb-6 flex-wrap justify-center">
+          <TabButton name="caption" icon={Zap} label="AI Caption" />
+          <TabButton name="hashtags" icon={Hash} label="Hashtags" />
           <TabButton name="timing" icon={Clock} label="Best Time" />
           <TabButton name="analytics" icon={BarChart3} label="Analytics" />
         </div>
 
         {/* Main Content Area */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          
+        <div className="bg-white rounded-2xl shadow-xl p-6">
           {/* Caption Generator Tab */}
           {activeTab === 'caption' && (
-            <div>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Zap className="text-purple-500" />
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <Zap className="text-yellow-500" />
                 AI Caption Generator
               </h2>
-              
-              {/* Video Upload */}
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 mb-6 text-center hover:border-purple-400 transition">
+
+              {/* Video Upload Section */}
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-purple-400 transition">
                 <input
                   type="file"
                   accept="video/*"
-                  onChange={(e) => setVideoFile(e.target.files[0])}
+                  onChange={handleVideoUpload}
                   className="hidden"
                   id="video-upload"
                 />
-                <label htmlFor="video-upload" className="cursor-pointer">
-                  <Upload className="mx-auto mb-4 text-gray-400" size={48} />
-                  <p className="text-gray-600">
-                    {videoFile ? videoFile.name : 'Click to upload video'}
-                  </p>
-                  <p className="text-sm text-gray-400 mt-2">MP4, MOV up to 500MB</p>
-                </label>
+                
+                {!videoFile ? (
+                  <label
+                    htmlFor="video-upload"
+                    className="flex flex-col items-center justify-center cursor-pointer"
+                  >
+                    <Video className="w-12 h-12 text-gray-400 mb-3" />
+                    <span className="text-lg font-medium text-gray-700 mb-1">
+                      Click to upload video
+                    </span>
+                    <span className="text-sm text-gray-500">MP4, MOV up to 500MB</span>
+                  </label>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Video Preview */}
+                    {videoPreview && (
+                      <div className="relative bg-black rounded-lg overflow-hidden">
+                        <video
+                          src={videoPreview}
+                          controls
+                          className="w-full max-h-96 object-contain"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* File Info */}
+                    <div className="flex items-center justify-between bg-green-50 p-4 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="font-medium text-gray-800">{videoFile.name}</p>
+                          <p className="text-sm text-gray-600">
+                            {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={removeVideo}
+                        className="p-2 hover:bg-red-100 rounded-full transition"
+                      >
+                        <X className="w-5 h-5 text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Language Mix Slider */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Language Mix</label>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm">English</span>
-                  <input type="range" min="0" max="100" defaultValue="70" className="flex-1" />
-                  <span className="text-sm">Hinglish</span>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Language Mix</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  className="w-full h-2 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>🇬🇧 English</span>
+                  <span>🇮🇳 Hinglish</span>
                 </div>
               </div>
 
               {/* Generate Button */}
               <button
                 onClick={generateCaption}
-                disabled={!videoFile || loading}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !videoFile}
+                className={`w-full py-4 rounded-xl font-semibold text-lg transition ${
+                  loading || !videoFile
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl'
+                }`}
               >
                 {loading ? '🔄 Generating...' : '✨ Generate Caption'}
               </button>
 
-              {/* Generated Caption */}
+              {/* Generated Output Section - Separate Box */}
               {caption && (
-                <div className="mt-6 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    📝 Generated Caption
-                    <button className="ml-auto text-sm bg-white px-3 py-1 rounded-lg hover:bg-gray-50">
-                      Copy
-                    </button>
-                  </h3>
-                  <p className="whitespace-pre-wrap text-gray-700">{caption}</p>
+                <div className="mt-8 border-t-4 border-purple-500 pt-6">
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        ✨ Your AI-Generated Content
+                      </h3>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(caption);
+                          alert('Caption copied to clipboard!');
+                        }}
+                        className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition text-sm font-medium"
+                      >
+                        📋 Copy All
+                      </button>
+                    </div>
+
+                    {/* Caption Box */}
+                    <div className="bg-white rounded-lg p-6 shadow-md">
+                      <h4 className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+                        📝 Caption
+                      </h4>
+                      <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                        {caption}
+                      </p>
+                    </div>
+
+                    {/* Hashtag Performance Box */}
+                    <div className="bg-white rounded-lg p-6 shadow-md">
+                      <h4 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wide">
+                        🏷️ Trending Hashtags
+                      </h4>
+                      <div className="space-y-3">
+                        {hashtags.map((item, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                          >
+                            <span className="font-medium text-purple-600">{item.tag}</span>
+                            <div className="flex gap-4 text-sm">
+                              <span className={`px-2 py-1 rounded ${
+                                item.trend === 'High' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                              }`}>
+                                {item.trend}
+                              </span>
+                              <span className="text-gray-600 font-medium">{item.engagement}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Stats */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white rounded-lg p-4 text-center shadow-md">
+                        <p className="text-2xl font-bold text-purple-600">287</p>
+                        <p className="text-xs text-gray-600">Character Count</p>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 text-center shadow-md">
+                        <p className="text-2xl font-bold text-pink-600">12</p>
+                        <p className="text-xs text-gray-600">Hashtags</p>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 text-center shadow-md">
+                        <p className="text-2xl font-bold text-blue-600">8.2%</p>
+                        <p className="text-xs text-gray-600">Avg Engagement</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -131,18 +260,8 @@ Swipe to see the magic ➡️
 
           {/* Hashtag Research Tab */}
           {activeTab === 'hashtags' && (
-            <div>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Hash className="text-purple-500" />
-                Hashtag Performance
-              </h2>
-              
-              <input
-                type="text"
-                placeholder="Search hashtags... (e.g., interior design)"
-                className="w-full p-3 border rounded-lg mb-6"
-              />
-
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-800">Hashtag Performance</h2>
               <div className="space-y-3">
                 {[
                   { tag: '#InteriorDesign', posts: '45M', trend: '📈 Rising', engagement: '8.2%' },
@@ -153,12 +272,12 @@ Swipe to see the magic ➡️
                 ].map((item, i) => (
                   <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
                     <div>
-                      <span className="font-semibold text-purple-600">{item.tag}</span>
-                      <span className="text-sm text-gray-500 ml-3">{item.posts} posts</span>
+                      <p className="font-semibold text-purple-600">{item.tag}</p>
+                      <p className="text-sm text-gray-600">{item.posts} posts</p>
                     </div>
                     <div className="flex gap-4 items-center">
                       <span className="text-sm">{item.trend}</span>
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
                         {item.engagement}
                       </span>
                     </div>
@@ -170,42 +289,34 @@ Swipe to see the magic ➡️
 
           {/* Best Time Tab */}
           {activeTab === 'timing' && (
-            <div>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Clock className="text-purple-500" />
-                Best Time to Post
-              </h2>
-              
-              <div className="grid grid-cols-7 gap-2 mb-6">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-center font-medium text-gray-600">{day}</div>
-                ))}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-800">Best Time to Post</h2>
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl">
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-center font-semibold text-gray-700">{day}</div>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <div key={i} className="grid grid-cols-7 gap-2">
+                      {['Morning', 'Afternoon', 'Evening'].map((time, j) => (
+                        <div
+                          key={j}
+                          className={`h-12 rounded flex items-center justify-center text-xs ${
+                            Math.random() > 0.5 ? 'bg-green-200' : 'bg-yellow-100'
+                          }`}
+                        >
+                          {time}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="space-y-2">
-                    {['Morning', 'Afternoon', 'Evening'].map((time, j) => (
-                      <div
-                        key={j}
-                        className={`p-3 rounded-lg text-center text-sm ${
-                          (i === 1 && j === 2) || (i === 3 && j === 1) || (i === 5 && j === 2)
-                            ? 'bg-green-500 text-white font-semibold'
-                            : (i === 0 || i === 6) && j === 0
-                            ? 'bg-red-100 text-red-600'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 p-4 bg-purple-50 rounded-lg">
-                <h3 className="font-semibold mb-2">🎯 Peak Engagement Times:</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
+              <div className="bg-purple-50 p-6 rounded-xl">
+                <h3 className="font-bold text-gray-800 mb-3">🎯 Peak Engagement Times:</h3>
+                <ul className="space-y-2 text-gray-700">
                   <li>• Monday Evening (6-9 PM) - 12.4% avg engagement</li>
                   <li>• Wednesday Afternoon (2-5 PM) - 11.8% avg engagement</li>
                   <li>• Friday Evening (7-10 PM) - 13.2% avg engagement</li>
@@ -216,54 +327,38 @@ Swipe to see the magic ➡️
 
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
-            <div>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <BarChart3 className="text-purple-500" />
-                Growth Analytics
-              </h2>
-
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl">
-                  <div className="text-3xl font-bold">+248</div>
-                  <div className="text-purple-100 text-sm">Followers (7 days)</div>
-                  <div className="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">+12.4% ↑</div>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-800">Growth Analytics</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-6 rounded-xl">
+                  <p className="text-3xl font-bold text-purple-700">+248</p>
+                  <p className="text-sm text-gray-700">Followers (7 days)</p>
+                  <p className="text-green-600 text-sm font-semibold">+12.4% ↑</p>
                 </div>
-                
-                <div className="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-xl">
-                  <div className="text-3xl font-bold">8.7%</div>
-                  <div className="text-pink-100 text-sm">Avg Engagement</div>
-                  <div className="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">+2.1% ↑</div>
+                <div className="bg-gradient-to-br from-pink-100 to-pink-200 p-6 rounded-xl">
+                  <p className="text-3xl font-bold text-pink-700">8.7%</p>
+                  <p className="text-sm text-gray-700">Avg Engagement</p>
+                  <p className="text-green-600 text-sm font-semibold">+2.1% ↑</p>
                 </div>
-                
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl">
-                  <div className="text-3xl font-bold">45.2K</div>
-                  <div className="text-blue-100 text-sm">Reach (7 days)</div>
-                  <div className="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">+18.3% ↑</div>
+                <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-6 rounded-xl">
+                  <p className="text-3xl font-bold text-blue-700">45.2K</p>
+                  <p className="text-sm text-gray-700">Reach (7 days)</p>
+                  <p className="text-green-600 text-sm font-semibold">+18.3% ↑</p>
                 </div>
               </div>
-
-              {/* Top Posts */}
-              <h3 className="font-semibold mb-3">🔥 Top Performing Posts</h3>
               <div className="space-y-3">
+                <h3 className="font-bold text-gray-800">🔥 Top Performing Posts</h3>
                 {[
                   { title: 'Kitchen Makeover Reel', engagement: '12.4%', reach: '18.2K', likes: '2.1K' },
                   { title: 'Living Room Design', engagement: '10.8%', reach: '15.7K', likes: '1.8K' },
                   { title: 'Bedroom Transformation', engagement: '9.2%', reach: '12.4K', likes: '1.5K' }
                 ].map((post, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center">
-                        <Image className="text-white" size={24} />
-                      </div>
-                      <div>
-                        <div className="font-semibold">{post.title}</div>
-                        <div className="text-sm text-gray-500">Engagement: {post.engagement}</div>
-                      </div>
-                    </div>
-                    <div className="text-right text-sm">
-                      <div className="text-gray-600">Reach: {post.reach}</div>
-                      <div className="text-gray-600">Likes: {post.likes}</div>
+                  <div key={i} className="bg-gray-50 p-4 rounded-lg">
+                    <p className="font-semibold text-gray-800 mb-2">{post.title}</p>
+                    <div className="flex gap-4 text-sm text-gray-600">
+                      <span>Engagement: {post.engagement}</span>
+                      <span>Reach: {post.reach}</span>
+                      <span>Likes: {post.likes}</span>
                     </div>
                   </div>
                 ))}
@@ -273,9 +368,9 @@ Swipe to see the magic ➡️
         </div>
 
         {/* Footer Info */}
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="text-center mt-8 text-gray-600 text-sm space-y-1">
           <p>💡 This tool uses AI to analyze and optimize your Instagram content</p>
-          <p className="mt-1">🔒 100% Safe • No Login Required • Privacy First</p>
+          <p>🔒 100% Safe • No Login Required • Privacy First</p>
         </div>
       </div>
     </div>
