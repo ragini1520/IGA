@@ -1,0 +1,285 @@
+import React, { useState } from 'react';
+import { Upload, TrendingUp, Hash, Clock, BarChart3, Zap, Video, Image } from 'lucide-react';
+
+const InstaGrowthAssistant = () => {
+  const [activeTab, setActiveTab] = useState('caption');
+  const [videoFile, setVideoFile] = useState(null);
+  const [caption, setCaption] = useState('');
+  const [hashtags, setHashtags] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Simulated AI Caption Generation
+  const generateCaption = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setCaption(`✨ Transform your space with stunning interiors! 
+
+Apne sapno ka ghar ab aur bhi kareeb hai. Premium sunmica aur modular designs jo aapke budget mein fit ho jaye! 
+
+Swipe to see the magic ➡️
+
+📞 Call now for FREE consultation!
+
+#InteriorDesign #HomeDecor #ModularKitchen #SunmicaDesigns #IndianHomes #InteriorIndia #HomeRenovation #LuxuryInteriors #AffordableInteriors #DreamHome #InteriorInspo #ReelItFeelIt`);
+      
+      setHashtags([
+        { tag: '#InteriorDesign', trend: 'High', engagement: '8.2%' },
+        { tag: '#HomeDecor', trend: 'High', engagement: '7.8%' },
+        { tag: '#ModularKitchen', trend: 'Medium', engagement: '6.5%' },
+        { tag: '#InteriorIndia', trend: 'High', engagement: '9.1%' },
+        { tag: '#LuxuryInteriors', trend: 'Medium', engagement: '5.9%' }
+      ]);
+      setLoading(false);
+    }, 2000);
+  };
+
+  const TabButton = ({ name, icon: Icon, label }) => (
+    <button
+      onClick={() => setActiveTab(name)}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+        activeTab === name
+          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      <Icon size={18} />
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            📱 Instagram Growth Assistant
+          </h1>
+          <p className="text-gray-600">AI-Powered Content Creation & Analytics Tool</p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap gap-3 mb-6 justify-center">
+          <TabButton name="caption" icon={Video} label="Caption Generator" />
+          <TabButton name="hashtags" icon={Hash} label="Hashtag Research" />
+          <TabButton name="timing" icon={Clock} label="Best Time" />
+          <TabButton name="analytics" icon={BarChart3} label="Analytics" />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          
+          {/* Caption Generator Tab */}
+          {activeTab === 'caption' && (
+            <div>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Zap className="text-purple-500" />
+                AI Caption Generator
+              </h2>
+              
+              {/* Video Upload */}
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 mb-6 text-center hover:border-purple-400 transition">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setVideoFile(e.target.files[0])}
+                  className="hidden"
+                  id="video-upload"
+                />
+                <label htmlFor="video-upload" className="cursor-pointer">
+                  <Upload className="mx-auto mb-4 text-gray-400" size={48} />
+                  <p className="text-gray-600">
+                    {videoFile ? videoFile.name : 'Click to upload video'}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-2">MP4, MOV up to 500MB</p>
+                </label>
+              </div>
+
+              {/* Language Mix Slider */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">Language Mix</label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm">English</span>
+                  <input type="range" min="0" max="100" defaultValue="70" className="flex-1" />
+                  <span className="text-sm">Hinglish</span>
+                </div>
+              </div>
+
+              {/* Generate Button */}
+              <button
+                onClick={generateCaption}
+                disabled={!videoFile || loading}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? '🔄 Generating...' : '✨ Generate Caption'}
+              </button>
+
+              {/* Generated Caption */}
+              {caption && (
+                <div className="mt-6 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    📝 Generated Caption
+                    <button className="ml-auto text-sm bg-white px-3 py-1 rounded-lg hover:bg-gray-50">
+                      Copy
+                    </button>
+                  </h3>
+                  <p className="whitespace-pre-wrap text-gray-700">{caption}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Hashtag Research Tab */}
+          {activeTab === 'hashtags' && (
+            <div>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Hash className="text-purple-500" />
+                Hashtag Performance
+              </h2>
+              
+              <input
+                type="text"
+                placeholder="Search hashtags... (e.g., interior design)"
+                className="w-full p-3 border rounded-lg mb-6"
+              />
+
+              <div className="space-y-3">
+                {[
+                  { tag: '#InteriorDesign', posts: '45M', trend: '📈 Rising', engagement: '8.2%' },
+                  { tag: '#HomeDecor', posts: '38M', trend: '🔥 Hot', engagement: '7.8%' },
+                  { tag: '#ModularKitchen', posts: '2.1M', trend: '📈 Rising', engagement: '6.5%' },
+                  { tag: '#InteriorIndia', posts: '890K', trend: '🔥 Hot', engagement: '9.1%' },
+                  { tag: '#IndianHomes', posts: '1.5M', trend: '➡️ Stable', engagement: '5.4%' }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                    <div>
+                      <span className="font-semibold text-purple-600">{item.tag}</span>
+                      <span className="text-sm text-gray-500 ml-3">{item.posts} posts</span>
+                    </div>
+                    <div className="flex gap-4 items-center">
+                      <span className="text-sm">{item.trend}</span>
+                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.engagement}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Best Time Tab */}
+          {activeTab === 'timing' && (
+            <div>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Clock className="text-purple-500" />
+                Best Time to Post
+              </h2>
+              
+              <div className="grid grid-cols-7 gap-2 mb-6">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center font-medium text-gray-600">{day}</div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    {['Morning', 'Afternoon', 'Evening'].map((time, j) => (
+                      <div
+                        key={j}
+                        className={`p-3 rounded-lg text-center text-sm ${
+                          (i === 1 && j === 2) || (i === 3 && j === 1) || (i === 5 && j === 2)
+                            ? 'bg-green-500 text-white font-semibold'
+                            : (i === 0 || i === 6) && j === 0
+                            ? 'bg-red-100 text-red-600'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {time}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+                <h3 className="font-semibold mb-2">🎯 Peak Engagement Times:</h3>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li>• Monday Evening (6-9 PM) - 12.4% avg engagement</li>
+                  <li>• Wednesday Afternoon (2-5 PM) - 11.8% avg engagement</li>
+                  <li>• Friday Evening (7-10 PM) - 13.2% avg engagement</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <BarChart3 className="text-purple-500" />
+                Growth Analytics
+              </h2>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+                  <div className="text-3xl font-bold">+248</div>
+                  <div className="text-purple-100 text-sm">Followers (7 days)</div>
+                  <div className="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">+12.4% ↑</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-xl">
+                  <div className="text-3xl font-bold">8.7%</div>
+                  <div className="text-pink-100 text-sm">Avg Engagement</div>
+                  <div className="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">+2.1% ↑</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+                  <div className="text-3xl font-bold">45.2K</div>
+                  <div className="text-blue-100 text-sm">Reach (7 days)</div>
+                  <div className="text-xs mt-2 bg-white/20 inline-block px-2 py-1 rounded">+18.3% ↑</div>
+                </div>
+              </div>
+
+              {/* Top Posts */}
+              <h3 className="font-semibold mb-3">🔥 Top Performing Posts</h3>
+              <div className="space-y-3">
+                {[
+                  { title: 'Kitchen Makeover Reel', engagement: '12.4%', reach: '18.2K', likes: '2.1K' },
+                  { title: 'Living Room Design', engagement: '10.8%', reach: '15.7K', likes: '1.8K' },
+                  { title: 'Bedroom Transformation', engagement: '9.2%', reach: '12.4K', likes: '1.5K' }
+                ].map((post, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center">
+                        <Image className="text-white" size={24} />
+                      </div>
+                      <div>
+                        <div className="font-semibold">{post.title}</div>
+                        <div className="text-sm text-gray-500">Engagement: {post.engagement}</div>
+                      </div>
+                    </div>
+                    <div className="text-right text-sm">
+                      <div className="text-gray-600">Reach: {post.reach}</div>
+                      <div className="text-gray-600">Likes: {post.likes}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <p>💡 This tool uses AI to analyze and optimize your Instagram content</p>
+          <p className="mt-1">🔒 100% Safe • No Login Required • Privacy First</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InstaGrowthAssistant;
